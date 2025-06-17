@@ -6,26 +6,154 @@
       <title>Arranjo de Palavras</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
       <style>
-          /* SEU CSS AQUI */
+          /* AJUSTE 1 & 2: CSS Aprimorado para Notion e Responsividade */
+          :root {
+              --cor-primaria: #007bff;
+              --cor-sucesso: #28a745;
+              --cor-erro: #dc3545;
+              --cor-fundo-botao: #f0f0f0;
+              --cor-texto-botao: #333;
+              --cor-borda: #ccc;
+          }
+
+          * {
+              box-sizing: border-box;
+              margin: 0;
+              padding: 0;
+          }
+
+          html, body {
+              height: 100%;
+              font-family: 'Inter', sans-serif;
+              background-color: #fff;
+              color: #333;
+              text-align: center;
+          }
+
+          body {
+              padding: 20px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+          }
+
+          h3 {
+              margin-bottom: 20px;
+              font-weight: 600;
+              color: #444;
+          }
+
+          #words-container {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+              gap: 10px;
+              margin-bottom: 25px;
+          }
+
+          .word-button {
+              padding: 10px 18px;
+              font-size: 16px;
+              font-family: 'Inter', sans-serif;
+              cursor: pointer;
+              border: 1px solid var(--cor-borda);
+              background-color: var(--cor-fundo-botao);
+              color: var(--cor-texto-botao);
+              border-radius: 8px;
+              transition: background-color 0.2s, transform 0.2s;
+          }
+
+          .word-button:hover {
+              background-color: #e0e0e0;
+              transform: translateY(-2px);
+          }
+
+          .word-button.selected {
+              background-color: #d0d0d0;
+              color: #888;
+              cursor: not-allowed;
+              border-color: #bbb;
+              text-decoration: line-through;
+          }
+
+          #sentence-container {
+              min-height: 50px;
+              width: 100%;
+              max-width: 600px;
+              padding: 15px;
+              margin-bottom: 20px;
+              border: 2px dashed var(--cor-borda);
+              border-radius: 8px;
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+              font-size: 18px;
+              font-weight: 600;
+          }
+          
+          .selected-word {
+              background-color: var(--cor-primaria);
+              color: white;
+              padding: 5px 10px;
+              border-radius: 5px;
+          }
+
+          #sentence-container.correct { border-color: var(--cor-sucesso); }
+          #sentence-container.wrong { border-color: var(--cor-erro); }
+
+          .feedback {
+              min-height: 24px;
+              font-weight: 600;
+              margin-bottom: 15px;
+          }
+
+          #main-action-button {
+              padding: 12px 25px;
+              font-size: 16px;
+              font-family: 'Inter', sans-serif;
+              font-weight: 600;
+              color: white;
+              background-color: var(--cor-primaria);
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: background-color 0.2s;
+          }
+
+          #main-action-button:hover { background-color: #0056b3; }
+
+          #main-action-button.reset { background-color: var(--cor-sucesso); }
+          #main-action-button.reset:hover { background-color: #218838; }
+
       </style>
   </head>
   <body>
   
   <h3>Clique nas palavras para montar a frase:</h3>
-  <div id="words-container"><button class="word-button" onclick="selectWord(this, {word: 'eu', type: 'palavra'})">eu</button><button class="word-button" onclick="selectWord(this, {word: 'quero', type: 'palavra'})">quero</button><button class="word-button" onclick="selectWord(this, {word: 'comer', type: 'palavra'})">comer</button><button class="word-button" onclick="selectWord(this, {word: 'banana', type: 'palavra'})">banana</button><button class="word-button" onclick="selectWord(this, {word: 'coca', type: 'distrator'})">coca</button><button class="word-button" onclick="selectWord(this, {word: 'leite', type: 'distrator'})">leite</button><button class="word-button" onclick="selectWord(this, {word: 'tudo', type: 'distrator'})">tudo</button></div>
+  <div id="words-container"><button class="word-button" onclick="selectWord(this, {word: 'eu', type: 'palavra'})">eu</button><button class="word-button" onclick="selectWord(this, {word: 'tudo', type: 'distrator'})">tudo</button><button class="word-button" onclick="selectWord(this, {word: 'quero', type: 'palavra'})">quero</button><button class="word-button" onclick="selectWord(this, {word: 'leite', type: 'distrator'})">leite</button><button class="word-button" onclick="selectWord(this, {word: 'comer', type: 'palavra'})">comer</button><button class="word-button" onclick="selectWord(this, {word: 'banana', type: 'palavra'})">banana</button><button class="word-button" onclick="selectWord(this, {word: 'coca', type: 'distrator'})">coca</button></div>
   <div id="sentence-container"></div>
   
   <div class="feedback" id="feedback"></div>
   
-  <button id="resetButton" onclick="resetActivity()">Tentar de novo</button>
-  <button onclick="checkAnswer()">Enviar</button>
+  <button id="main-action-button" onclick="checkAnswer()">Enviar</button>
   
   <script>
     var selectedWords = [];
-    const correctAnswer = "eu quero comer banana"; // Injeta a resposta correta aqui
-  
+    const correctAnswer = "eu quero comer banana";
+
+    /* AJUSTE 3: Pré-carrega o som para evitar atrasos no primeiro clique */
+    // SUBSTITUA a URL abaixo pela URL do seu arquivo de som
+    const clickSound = new Audio('https://raw.githubusercontent.com/humbertoman/ajuste_palavras/main/click.mp3'); 
+
     function selectWord(button, word) {
       if (!button.classList.contains('selected')) {
+          // Toca o som a cada clique válido
+          clickSound.currentTime = 0; // Reinicia o som se o usuário clicar rápido
+          clickSound.play();
+
           selectedWords.push(word.word);
           button.classList.add('selected');
           button.disabled = true;
@@ -49,16 +177,21 @@
       const userAnswer = selectedWords.join(" ");
       const feedback = document.getElementById("feedback");
       const sentenceContainer = document.getElementById("sentence-container");
+      const actionButton = document.getElementById("main-action-button");
   
       if (userAnswer === correctAnswer) {
         feedback.textContent = "Você acertou! Frase correta!";
-        feedback.style.color = "green";
+        feedback.style.color = "var(--cor-sucesso)";
         sentenceContainer.classList.add("correct");
         sentenceContainer.classList.remove("wrong");
-        document.getElementById("resetButton").style.display = "inline-block";
+        
+        actionButton.textContent = "Tentar de Novo";
+        actionButton.onclick = resetActivity;
+        actionButton.classList.add("reset");
+
       } else {
         feedback.textContent = "Resposta errada. Tente novamente.";
-        feedback.style.color = "red";
+        feedback.style.color = "var(--cor-erro)";
         sentenceContainer.classList.add("wrong");
         sentenceContainer.classList.remove("correct");
       }
@@ -67,7 +200,6 @@
     function resetActivity() {
       selectedWords = [];
       document.getElementById("feedback").textContent = "";
-      document.getElementById("resetButton").style.display = "none";
       const sentenceContainer = document.getElementById("sentence-container");
       sentenceContainer.classList.remove("correct", "wrong");
       
@@ -77,6 +209,11 @@
           button.disabled = false;
       });
   
+      const actionButton = document.getElementById("main-action-button");
+      actionButton.textContent = "Enviar";
+      actionButton.onclick = checkAnswer;
+      actionButton.classList.remove("reset");
+
       updateSentence();
     }
   </script>
