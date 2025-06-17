@@ -1,63 +1,84 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Arranjo de Palavras</title>
-<style>
-  .word-button { display: inline-block; padding: 10px; margin: 5px; background-color: lightblue; border-radius: 5px; cursor: pointer; }
-  .selected-word { display: inline-block; padding: 10px; margin: 5px; background-color: lightgreen; border-radius: 5px; }
-  .feedback { margin-top: 20px; font-size: 18px; font-weight: bold; }
-  #resetButton { display: none; margin-top: 10px; padding: 10px 20px; background-color: lightcoral; border-radius: 5px; cursor: pointer; }
-  .word-button.selected { background-color: lightgreen; }
-</style>
-</head><body>
-<h3>Clique nas palavras para montar a frase:</h3>
-<div id="words-container"><button class="word-button" onclick="selectWord('eu')">eu</button><button class="word-button" onclick="selectWord('quero')">quero</button><button class="word-button" onclick="selectWord('comer')">comer</button><button class="word-button" onclick="selectWord('banana')">banana</button><button class="word-button" onclick="selectWord('coca')">coca</button><button class="word-button" onclick="selectWord('leite')">leite</button><button class="word-button" onclick="selectWord('tudo')">tudo</button></div>
-<div id="sentence-container"></div>
-<div class="feedback" id="feedback"></div>
-<button id="resetButton" onclick="resetActivity()">Tentar de novo</button>
-<button onclick="checkAnswer()">Enviar</button>
-<script>
-  var selectedWords = [];
-  var correctAnswer = "eu quero comer banana";
-
-  // Fun??o para selecionar palavras
-  function selectWord(word) {
-    if (!selectedWords.includes(word)) {
-      selectedWords.push(word);
+  <html lang="pt-br">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Arranjo de Palavras</title>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+      <style>
+          /* SEU CSS AQUI */
+      </style>
+  </head>
+  <body>
+  
+  <h3>Clique nas palavras para montar a frase:</h3>
+  <div id="words-container"><button class="word-button" onclick="selectWord(this, {word: 'eu', type: 'palavra'})">eu</button><button class="word-button" onclick="selectWord(this, {word: 'quero', type: 'palavra'})">quero</button><button class="word-button" onclick="selectWord(this, {word: 'comer', type: 'palavra'})">comer</button><button class="word-button" onclick="selectWord(this, {word: 'banana', type: 'palavra'})">banana</button><button class="word-button" onclick="selectWord(this, {word: 'coca', type: 'distrator'})">coca</button><button class="word-button" onclick="selectWord(this, {word: 'leite', type: 'distrator'})">leite</button><button class="word-button" onclick="selectWord(this, {word: 'tudo', type: 'distrator'})">tudo</button></div>
+  <div id="sentence-container"></div>
+  
+  <div class="feedback" id="feedback"></div>
+  
+  <button id="resetButton" onclick="resetActivity()">Tentar de novo</button>
+  <button onclick="checkAnswer()">Enviar</button>
+  
+  <script>
+    var selectedWords = [];
+    const correctAnswer = "eu quero comer banana"; // Injeta a resposta correta aqui
+  
+    function selectWord(button, word) {
+      if (!button.classList.contains('selected')) {
+          selectedWords.push(word.word);
+          button.classList.add('selected');
+          button.disabled = true;
+          updateSentence();
+      }
+    }
+  
+    function updateSentence() {
+      const sentenceContainer = document.getElementById("sentence-container");
+      sentenceContainer.innerHTML = "";
+  
+      selectedWords.forEach(word => {
+        const wordSpan = document.createElement("span");
+        wordSpan.classList.add("selected-word");
+        wordSpan.textContent = word;
+        sentenceContainer.appendChild(wordSpan);
+      });
+    }
+  
+    function checkAnswer() {
+      const userAnswer = selectedWords.join(" ");
+      const feedback = document.getElementById("feedback");
+      const sentenceContainer = document.getElementById("sentence-container");
+  
+      if (userAnswer === correctAnswer) {
+        feedback.textContent = "Você acertou! Frase correta!";
+        feedback.style.color = "green";
+        sentenceContainer.classList.add("correct");
+        sentenceContainer.classList.remove("wrong");
+        document.getElementById("resetButton").style.display = "inline-block";
+      } else {
+        feedback.textContent = "Resposta errada. Tente novamente.";
+        feedback.style.color = "red";
+        sentenceContainer.classList.add("wrong");
+        sentenceContainer.classList.remove("correct");
+      }
+    }
+  
+    function resetActivity() {
+      selectedWords = [];
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("resetButton").style.display = "none";
+      const sentenceContainer = document.getElementById("sentence-container");
+      sentenceContainer.classList.remove("correct", "wrong");
+      
+      const buttons = document.querySelectorAll('.word-button');
+      buttons.forEach(button => {
+          button.classList.remove('selected');
+          button.disabled = false;
+      });
+  
       updateSentence();
     }
-  }
-
-  // Fun??o para atualizar a frase
-  function updateSentence() {
-    const sentenceContainer = document.getElementById("sentence-container");
-    sentenceContainer.innerHTML = "";
-    selectedWords.forEach(word => {
-      const wordSpan = document.createElement("span");
-      wordSpan.classList.add("selected-word");
-      wordSpan.textContent = word;
-      sentenceContainer.appendChild(wordSpan);
-    });
-  }
-
-  // Fun??o para verificar se a resposta est? correta
-  function checkAnswer() {
-    const answer = selectedWords.join(" ");
-    const feedback = document.getElementById("feedback");
-    if (answer === correctAnswer) {
-      feedback.textContent = "Voc? acertou! Frase correta!";
-      feedback.style.color = "green";
-      document.getElementById("resetButton").style.display = "inline-block";
-    } else {
-      feedback.textContent = "Resposta errada. Tente novamente.";
-      feedback.style.color = "red";
-    }
-  }
-
-  // Fun??o para reiniciar a atividade
-  function resetActivity() {
-    selectedWords = [];
-    document.getElementById("feedback").textContent = "";
-    document.getElementById("resetButton").style.display = "none";
-    updateSentence();
-  }
-</script>
-</body></html>
+  </script>
+  </body>
+  </html>
