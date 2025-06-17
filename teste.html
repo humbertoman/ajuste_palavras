@@ -142,7 +142,7 @@
 <body>
     <div class="activity-container">
         <h3>Clique nas palavras para montar a frase:</h3>
-        <div id="words-container"><button class="word-button" onclick="selectWord(this)">banana</button><button class="word-button" onclick="selectWord(this)">eu</button><button class="word-button" onclick="selectWord(this)">comer</button><button class="word-button" onclick="selectWord(this)">quero</button><button class="word-button" onclick="selectWord(this)">leite</button><button class="word-button" onclick="selectWord(this)">coca</button><button class="word-button" onclick="selectWord(this)">tudo</button></div>
+        <div id="words-container"><button class="word-button" onclick="selectWord(this)">comer</button><button class="word-button" onclick="selectWord(this)">alguem</button><button class="word-button" onclick="selectWord(this)">tudo</button><button class="word-button" onclick="selectWord(this)">leite</button><button class="word-button" onclick="selectWord(this)">depois</button><button class="word-button" onclick="selectWord(this)">avisa</button><button class="word-button" onclick="selectWord(this)">ele</button></div>
         <div id="sentence-container"></div>
         <div class="feedback" id="feedback"></div>
         <div class="action-buttons">
@@ -153,7 +153,7 @@
     <script>
         let selectedWords = [];
         let selectedButtons = [];
-        const correctAnswer = "eu quero comer banana";
+        const correctAnswer = "ele alguem comer depois";
         
         const clickSound = new Audio('sound_click.mp3');
         // AJUSTE 5.1: Cria os objetos de áudio para certo e errado. Assumindo nomes right.mp3 e wrong.mp3
