@@ -1,84 +1,224 @@
 <!DOCTYPE html>
-  <html lang="pt-br">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Arranjo de Palavras</title>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-      <style>
-          /* SEU CSS AQUI */
-      </style>
-  </head>
-  <body>
-  
-  <h3>Clique nas palavras para montar a frase:</h3>
-  <div id="words-container"><button class="word-button" onclick="selectWord(this, {word: 'eu', type: 'palavra'})">eu</button><button class="word-button" onclick="selectWord(this, {word: 'quero', type: 'palavra'})">quero</button><button class="word-button" onclick="selectWord(this, {word: 'comer', type: 'palavra'})">comer</button><button class="word-button" onclick="selectWord(this, {word: 'banana', type: 'palavra'})">banana</button><button class="word-button" onclick="selectWord(this, {word: 'coca', type: 'distrator'})">coca</button><button class="word-button" onclick="selectWord(this, {word: 'leite', type: 'distrator'})">leite</button><button class="word-button" onclick="selectWord(this, {word: 'tudo', type: 'distrator'})">tudo</button></div>
-  <div id="sentence-container"></div>
-  
-  <div class="feedback" id="feedback"></div>
-  
-  <button id="resetButton" onclick="resetActivity()">Tentar de novo</button>
-  <button onclick="checkAnswer()">Enviar</button>
-  
-  <script>
-    var selectedWords = [];
-    const correctAnswer = "eu quero comer banana"; // Injeta a resposta correta aqui
-  
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arranjo de Palavras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@10..48,400;10..48,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h3 {
+            text-align: center;
+            color: #5d5c6a;
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        #words-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+
+        .word-button {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            background-color: #f8f8f8;
+            border: 1px solid #dcdcdc;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .word-button:hover {
+            transform: translateY(-2px);
+            border-color: #b0b0b0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .word-button:disabled {
+            background-color: #e0e0e0;
+            color: #888;
+            border-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #sentence-container {
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            min-height: 50px;
+            width: 80%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            border: 2px dashed #ddd;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .selected-word {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 600;
+            background-color: #e3f2fd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            color: #1976d2;
+        }
+
+        #sentence-container.correct {
+            border-color: #66bb6a;
+            border-style: solid;
+            background-color: #e8f5e9;
+        }
+
+        #sentence-container.wrong {
+            border-color: #ef5350;
+            border-style: solid;
+            background-color: #ffebee;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            height: 25px;
+        }
+
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #controls button {
+            padding: 12px 30px;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        #submitButton {
+            background-color: #1976d2;
+        }
+        #submitButton:hover {
+            background-color: #1565c0;
+        }
+
+        #resetButton {
+            background-color: #ff7043;
+            display: none; /* Começa escondido */
+        }
+        #resetButton:hover {
+            background-color: #ff5722;
+        }
+    </style>
+</head>
+<body>
+
+<h3>Clique nas palavras para montar a frase:</h3>
+<div id="words-container"><button class="word-button" onclick="selectWord(this, 'eu')">eu</button><button class="word-button" onclick="selectWord(this, 'quero')">quero</button><button class="word-button" onclick="selectWord(this, 'tudo')">tudo</button><button class="word-button" onclick="selectWord(this, 'comer')">comer</button><button class="word-button" onclick="selectWord(this, 'banana')">banana</button><button class="word-button" onclick="selectWord(this, 'coca')">coca</button><button class="word-button" onclick="selectWord(this, 'leite')">leite</button></div>
+<div id="sentence-container"></div>
+<div class="feedback" id="feedback"></div>
+
+<div id="controls">
+    <button id="submitButton" onclick="checkAnswer()">Enviar</button>
+    <button id="resetButton" onclick="resetActivity()">Tentar de novo</button>
+</div>
+
+<script>
+    let selectedWords = [];
+    const correctAnswer = "eu quero comer banana";
+    const submitButton = document.getElementById("submitButton");
+    const resetButton = document.getElementById("resetButton");
+    const feedback = document.getElementById("feedback");
+    const sentenceContainer = document.getElementById("sentence-container");
+
     function selectWord(button, word) {
-      if (!button.classList.contains('selected')) {
-          selectedWords.push(word.word);
-          button.classList.add('selected');
-          button.disabled = true;
-          updateSentence();
-      }
+        selectedWords.push(word);
+        button.disabled = true; // Desabilita o botão para não ser clicado de novo
+        updateSentence();
     }
-  
+
     function updateSentence() {
-      const sentenceContainer = document.getElementById("sentence-container");
-      sentenceContainer.innerHTML = "";
-  
-      selectedWords.forEach(word => {
-        const wordSpan = document.createElement("span");
-        wordSpan.classList.add("selected-word");
-        wordSpan.textContent = word;
-        sentenceContainer.appendChild(wordSpan);
-      });
+        sentenceContainer.innerHTML = "";
+        selectedWords.forEach(word => {
+            const wordSpan = document.createElement("span");
+            wordSpan.classList.add("selected-word");
+            wordSpan.textContent = word;
+            sentenceContainer.appendChild(wordSpan);
+        });
     }
-  
+
     function checkAnswer() {
-      const userAnswer = selectedWords.join(" ");
-      const feedback = document.getElementById("feedback");
-      const sentenceContainer = document.getElementById("sentence-container");
-  
-      if (userAnswer === correctAnswer) {
-        feedback.textContent = "Você acertou! Frase correta!";
-        feedback.style.color = "green";
-        sentenceContainer.classList.add("correct");
-        sentenceContainer.classList.remove("wrong");
-        document.getElementById("resetButton").style.display = "inline-block";
-      } else {
-        feedback.textContent = "Resposta errada. Tente novamente.";
-        feedback.style.color = "red";
-        sentenceContainer.classList.add("wrong");
-        sentenceContainer.classList.remove("correct");
-      }
+        const userAnswer = selectedWords.join(" ");
+        sentenceContainer.classList.remove("correct", "wrong");
+
+        if (userAnswer === correctAnswer) {
+            feedback.textContent = "Você acertou! Frase correta!";
+            feedback.style.color = "#2e7d32";
+            sentenceContainer.classList.add("correct");
+        } else {
+            feedback.textContent = "Resposta errada. Tente novamente.";
+            feedback.style.color = "#d32f2f";
+            sentenceContainer.classList.add("wrong");
+        }
+        
+        // 2. MOSTRA O BOTÃO "TENTAR DE NOVO" (PROBLEMA 2 RESOLVIDO)
+        resetButton.style.display = "inline-block";
+        submitButton.style.display = "none"; // Esconde o botão Enviar
     }
-  
+
     function resetActivity() {
-      selectedWords = [];
-      document.getElementById("feedback").textContent = "";
-      document.getElementById("resetButton").style.display = "none";
-      const sentenceContainer = document.getElementById("sentence-container");
-      sentenceContainer.classList.remove("correct", "wrong");
-      
-      const buttons = document.querySelectorAll('.word-button');
-      buttons.forEach(button => {
-          button.classList.remove('selected');
-          button.disabled = false;
-      });
-  
-      updateSentence();
+        selectedWords = [];
+        feedback.textContent = "";
+        sentenceContainer.classList.remove("correct", "wrong");
+        updateSentence();
+        
+        // Habilita todos os botões de palavras novamente
+        document.querySelectorAll('.word-button').forEach(button => {
+            button.disabled = false;
+        });
+        
+        resetButton.style.display = "none";
+        submitButton.style.display = "inline-block";
     }
-  </script>
-  </body>
-  </html>
+</script>
+</body>
+</html>
