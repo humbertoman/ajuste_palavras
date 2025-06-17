@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arranjo de Palavras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --correct-green: #28a745;
+            --wrong-red: #dc3545;
+            --border-radius: 25px;
+            --border-radius-small: 8px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--light-gray);
+            color: #333;
+            padding: 20px;
+            text-align: center;
+        }
+        .activity-container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+        #words-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        #sentence-container {
+            min-height: 60px;
+            border: 2px dashed var(--medium-gray);
+            border-radius: var(--border-radius-small);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .word-button {
+            background-color: var(--light-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .word-button:hover {
+            background-color: var(--medium-gray);
+            transform: translateY(-2px);
+        }
+        .word-button:disabled, .word-button.selected {
+            background-color: var(--dark-gray);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+        .selected-word {
+            background-color: var(--medium-gray);
+            padding: 5px 10px;
+            border-radius: var(--border-radius-small);
+        }
+        #feedback {
+            min-height: 24px;
+            font-weight: 600;
+            /* AJUSTE 1: A margem inferior foi reduzida de 20px para 15px para diminuir o espaço */
+            margin-bottom: 15px;
+        }
+        #sentence-container.correct {
+            border-color: var(--correct-green);
+            background-color: #f0fff4;
+        }
+        #sentence-container.wrong {
+            border-color: var(--wrong-red);
+            background-color: #fff5f5;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .action-button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        #submitButton {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        #submitButton:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        #resetButton {
+            background-color: var(--dark-gray);
+            color: white;
+            display: none;
+        }
+        #resetButton:hover {
+            background-color: #5a6268;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="activity-container">
+        <h3>Clique nas palavras para montar a frase:</h3>
+        <div id="words-container"><button class="word-button" onclick="selectWord(this)">eu</button><button class="word-button" onclick="selectWord(this)">quero</button><button class="word-button" onclick="selectWord(this)">leite</button><button class="word-button" onclick="selectWord(this)">coca</button><button class="word-button" onclick="selectWord(this)">banana</button><button class="word-button" onclick="selectWord(this)">comer</button><button class="word-button" onclick="selectWord(this)">tudo</button></div>
+        
+        <div id="sentence-container"></div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="action-buttons">
+            <button id="submitButton" class="action-button" onclick="checkAnswer()">Enviar</button>
+            <button id="resetButton" class="action-button" onclick="resetActivity()">Tentar de novo</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedWords = [];
+        let selectedButtons = [];
+        const correctAnswer = "eu quero comer banana";
+        
+        const feedbackEl = document.getElementById("feedback");
+        const sentenceContainer = document.getElementById("sentence-container");
+        const resetButton = document.getElementById("resetButton");
+        const submitButton = document.getElementById("submitButton");
+        const wordsContainer = document.getElementById("words-container");
+
+        function selectWord(button) {
+            if (button.classList.contains('selected')) {
+                // Lógica de desselecionar pode ser adicionada aqui se desejado
+            } else {
+                button.classList.add('selected');
+                button.disabled = true;
+                
+                selectedWords.push(button.textContent);
+                selectedButtons.push(button);
+                
+                updateSentence();
+            }
+        }
+    
+        function updateSentence() {
+            sentenceContainer.innerHTML = "";
+            selectedWords.forEach(word => {
+                const wordSpan = document.createElement("span");
+                wordSpan.className = "selected-word";
+                wordSpan.textContent = word;
+                sentenceContainer.appendChild(wordSpan);
+            });
+        }
+
+        function checkAnswer() {
+            const userAnswer = selectedWords.join(" ");
+            
+            submitButton.style.display = "none";
+
+            if (userAnswer === correctAnswer) {
+                feedbackEl.textContent = "Você acertou! Frase correta!";
+                feedbackEl.style.color = "var(--correct-green)";
+                sentenceContainer.classList.add("correct");
+                sentenceContainer.classList.remove("wrong");
+                
+                resetButton.style.display = "inline-block";
+
+            } else {
+                feedbackEl.textContent = "Resposta errada. Tente novamente.";
+                feedbackEl.style.color = "var(--wrong-red)";
+                sentenceContainer.classList.add("wrong");
+                sentenceContainer.classList.remove("correct");
+                
+                resetButton.style.display = "inline-block";
+            }
+        }
+
+        function resetActivity() {
+            selectedWords = [];
+            selectedButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = false;
+            });
+            selectedButtons = [];
+            
+            feedbackEl.textContent = "";
+            sentenceContainer.innerHTML = "";
+            sentenceContainer.classList.remove("correct", "wrong");
+
+            resetButton.style.display = "none";
+            submitButton.style.display = "inline-block";
+        }
+    </script>
+</body>
+</html>
